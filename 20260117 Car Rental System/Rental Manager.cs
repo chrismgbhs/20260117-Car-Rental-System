@@ -66,9 +66,7 @@ namespace _20260117_Car_Rental_System
             }
 
             Console.WriteLine("Car inventory loading complete. Enter any key to continue.");
-            Console.ReadKey();
-
-            
+            Console.ReadKey();   
         }
 
         public static bool CheckDuplicates(string plateNumber)
@@ -83,9 +81,9 @@ namespace _20260117_Car_Rental_System
                 }
             }
 
-            foreach (Car car in Cars_Out.carsRented)
+            foreach (Borrowed_Car borrowed_car in Cars_Out.carsRented)
             {
-                if (car.LicensePlate == plateNumber)
+                if (borrowed_car.Car.LicensePlate == plateNumber)
                 {
                     duplicateFound = true;
                 }
@@ -184,10 +182,10 @@ namespace _20260117_Car_Rental_System
 
             Console.WriteLine("View Rented Cars:");
 
-            foreach (Car car in Cars_Out.carsRented)
+            foreach (Borrowed_Car borrowed_car in Cars_Out.carsRented)
             {
                 counter++;
-                Console.WriteLine($"{counter}. {car.startMonth}/{car.startDay}/{car.startYear} to {car.endMonth}/{car.endDay}/{car.endYear}: {car.Name} - {car.Brand} - {car.Age} - {car.LicensePlate} | Borrower: {car.borrowerName}");
+                Console.WriteLine($"{counter}. {borrowed_car.StartDateTime} to {borrowed_car.EndDateTime}: {borrowed_car.Car.Name} - {borrowed_car.Car.Brand} - {borrowed_car.Car.Age} - {borrowed_car.Car.LicensePlate} | Borrower: {borrowed_car.BorrowerName}");
             }
         }
 
@@ -334,22 +332,21 @@ namespace _20260117_Car_Rental_System
                 }
             }
 
-            Cars_Out.carsRented.Add(Cars_In.carsAvailable[carNumber - 1]);
-            Cars_In.carsAvailable[carNumber - 1].borrowerName = borrowerName;
-            Cars_In.carsAvailable[carNumber - 1].startYear = DateTime.Today.Year;
-            Cars_In.carsAvailable[carNumber - 1].startMonth = DateTime.Today.Month;
-            Cars_In.carsAvailable[carNumber - 1].startDay = DateTime.Today.Day;
-            Cars_In.carsAvailable[carNumber - 1].endYear = rentalYear;
-            Cars_In.carsAvailable[carNumber - 1].endMonth = rentalMonth;
-            Cars_In.carsAvailable[carNumber - 1].endDay = rentalDay;
-            Console.WriteLine($"{Cars_In.carsAvailable[carNumber - 1].Name} has been rented on {Cars_In.carsAvailable[carNumber - 1].startYear}/{Cars_In.carsAvailable[carNumber - 1].startMonth}/{Cars_In.carsAvailable[carNumber - 1].startDay} until {Cars_In.carsAvailable[carNumber - 1].endYear}/{Cars_In.carsAvailable[carNumber - 1].endMonth}/{Cars_In.carsAvailable[carNumber - 1].endDay}.");
+            string startDateTime = $"{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}";
+            string endDateTime = $"{rentalMonth}/{rentalDay}/{rentalYear}";
+            Borrowed_Car borrowed_car = new Borrowed_Car(Cars_In.carsAvailable[carNumber-1],borrowerName,startDateTime,endDateTime);
+            Cars_Out.carsRented.Add(borrowed_car);
+
+            Console.WriteLine($"{borrowed_car.Car.Name} has been rented on {borrowed_car.StartDateTime} until {borrowed_car.EndDateTime}.");
 
             List<string> content = new List<string>();
             content.Add(DateTime.Now.ToString());
-            content.Add($"Model: {Cars_In.carsAvailable[carNumber - 1].Name} | Plate Number: {Cars_In.carsAvailable[carNumber - 1].LicensePlate}");
-            content.Add($"Borrowed by {Cars_In.carsAvailable[carNumber - 1].borrowerName} from {Cars_In.carsAvailable[carNumber - 1].startYear}/{Cars_In.carsAvailable[carNumber - 1].startMonth}/{Cars_In.carsAvailable[carNumber - 1].startDay} until {Cars_In.carsAvailable[carNumber - 1].endYear}/{Cars_In.carsAvailable[carNumber - 1].endMonth}/{Cars_In.carsAvailable[carNumber - 1].endDay}");
+
+            content.Add($"Model: {borrowed_car.Car.Name} | Plate Number: {borrowed_car.Car.LicensePlate}");
+            content.Add($"Borrowed by {borrowed_car.BorrowerName} from {borrowed_car.StartDateTime} until {borrowed_car.EndDateTime}");
 
             Cars_In.carsAvailable.RemoveAt(carNumber - 1);
+
             File_Manager file_manager = new File_Manager("receipt.csv");
             file_manager.Write(content, false);
             Console.WriteLine("Please enter any key to go back to main menu. Receipt has been printed.");
@@ -359,8 +356,27 @@ namespace _20260117_Car_Rental_System
 
         public static void ReturnCar()
         {
+            int carNumber;
             ViewRentedCars();
+            while(true)
+            {
+                Console.Write("Enter the number of the car you want to return: ");
+                int.TryParse(Console.ReadLine(), out carNumber);
 
+                if (carNumber > 0 && carNumber <= Cars_Out.carsRented.Count)
+                {
+                    break;
+                }
+
+                else
+                {
+                    Console.WriteLine("Invalid car number.");
+                }
+            }
+
+            Cars_In.carsAvailable.Add(Cars_Out.carsRented[carNumber - 1].Car);
+            Cars_Out.carsRented.RemoveAt(carNumber - 1);
+            Console.WriteLine("Car has been returned successfully. Press any key to return to main menu.");
         }
 
         public static void SendCarToMaintenance()

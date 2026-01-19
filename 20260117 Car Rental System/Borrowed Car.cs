@@ -10,15 +10,15 @@ namespace _20260117_Car_Rental_System
     {
         public Car Car;
         public string BorrowerName;
-        public DateTime ScheduleStart;
-        public DateTime ScheduleEnd;
+        public string StartDateTime;
+        public string EndDateTime;
 
-        public Borrowed_Car(Car car, string borrowerName, DateTime scheduleStart, DateTime scheduleEnd)
+        public Borrowed_Car(Car car, string borrowerName, string startDateTime, string endDateTime)
         {
             Car = car;
             BorrowerName = borrowerName;
-            ScheduleStart = scheduleStart;
-            ScheduleEnd = scheduleEnd;
+            StartDateTime = startDateTime;
+            EndDateTime = endDateTime;
         }
     }
 }

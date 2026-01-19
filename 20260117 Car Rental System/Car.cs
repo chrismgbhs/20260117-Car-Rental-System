@@ -12,17 +12,6 @@ namespace _20260117_Car_Rental_System
         public string Brand;
         public string Age;
         public string LicensePlate;
-        public string borrowerName;
-        public bool maintenanceStatus;
-        public string maintenanceDetails;
-        public string maintenanceWorker;
-        public int startYear;
-        public int startMonth;
-        public int startDay;
-        public int endYear;
-        public int endMonth;
-        public int endDay;
-        public List<Maintenance> MaintenanceHistory;
 
         public Car(string name, string brand, string age, string licensePlate)
         {
@@ -30,7 +19,6 @@ namespace _20260117_Car_Rental_System
             Brand = brand;
             Age = age;
             LicensePlate = licensePlate;
-            MaintenanceHistory = new List<Maintenance>();
 
         }
     }
