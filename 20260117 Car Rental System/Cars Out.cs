@@ -13,7 +13,6 @@ namespace _20260117_Car_Rental_System
         public static void InitializeCarsOutList()
         {
             File_Manager file_Manager = new File_Manager("cars_out.csv");
-            carsRented.Clear();
 
             foreach (string line in file_Manager.getLines())
             {
@@ -31,7 +30,7 @@ namespace _20260117_Car_Rental_System
 
             foreach (Borrowed_Car borrowed_Car in carsRented)
             {
-                string line = $"{borrowed_Car.Car.Name},{borrowed_Car.Car.Brand},{borrowed_Car.Car.Age},{borrowed_Car.Car.LicensePlate},{borrowed_Car.BorrowerName},{borrowed_Car.StartDateTime},{borrowed_Car.EndDateTime}";
+                lines.Add($"{borrowed_Car.Car.Name},{borrowed_Car.Car.Brand},{borrowed_Car.Car.Age},{borrowed_Car.Car.LicensePlate},{borrowed_Car.BorrowerName},{borrowed_Car.StartDateTime},{borrowed_Car.EndDateTime}");
             }
 
             file_Manager.Write(lines, false);

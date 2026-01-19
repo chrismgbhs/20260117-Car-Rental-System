@@ -17,7 +17,6 @@ namespace _20260117_Car_Rental_System
         static void Main(string[] args)
         {
             Rental_Manager.StartRentalSystem();
-            Rental_Manager.AddCarToInventory();
             Rental_Manager.MainMenu();
 
             // Further implementation goes here

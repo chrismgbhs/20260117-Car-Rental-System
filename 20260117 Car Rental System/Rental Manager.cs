@@ -15,58 +15,14 @@ namespace _20260117_Car_Rental_System
         public static void StartRentalSystem()
         {
             Console.WriteLine("Welcome to the Car Rental System!");
+            Cars_In.InitializeCarsInList();
+            Cars_Out.InitializeCarsOutList();
+            Cars_in_Maintenance.InitializeMaintenancesList();
         }
 
-        public static void AddCarToInventory()
+        public static void AddCarsToInventory()
         {
-            Console.WriteLine("Adding cars to inventory from file...");
-            File_Manager carFileManager = new File_Manager("cars.csv");
-
-            if (!carFileManager.Read())
-            {
-                Console.WriteLine("Error reading car data. Exiting...");
-                return;
-            }
-
-            else
-            {
-                List<string> carLines = carFileManager.getLines();
-
-                foreach (string line in carLines)
-                {
-                    //Thread.Sleep(100);
-                    string[] parts = line.Split(',');
-                    if (parts.Length >= 4)
-                    {
-                        string modelName = parts[0].Trim();
-                        string brand = parts[1].Trim();
-                        string age = parts[2].Trim();
-                        string plateNumber = parts[3].Trim();
-                        Car car = new Car(modelName, brand, age, plateNumber);
-
-                        if (!CheckDuplicates(plateNumber))
-                        {
-                            Cars_In.AddCar(car);
-                            Console.WriteLine($"Added car: {modelName}, {brand}, {age}, {plateNumber}");
-                        }
-
-                        else
-                        {
-                            Console.WriteLine($"Duplicate car found with plate number: {plateNumber}. Skipping addition.");
-                        }
-
-
-                    }
-
-                    else
-                    {
-                        Console.WriteLine($"Invalid car data line: {line}");
-                    }
-                }
-            }
-
-            Console.WriteLine("Car inventory loading complete. Enter any key to continue.");
-            Console.ReadKey();   
+            
         }
 
         public static bool CheckDuplicates(string plateNumber)
@@ -89,9 +45,9 @@ namespace _20260117_Car_Rental_System
                 }
             }
 
-            foreach (Car car in Cars_in_Maintenance.carsInMaintenance)
+            foreach (Maintenance maintenance in Cars_in_Maintenance.carsInMaintenance)
             {
-                if (car.LicensePlate == plateNumber)
+                if (maintenance.Car.LicensePlate == plateNumber)
                 {
                     duplicateFound = true;
                 }
@@ -102,65 +58,79 @@ namespace _20260117_Car_Rental_System
 
         public static void MainMenu()
         {
-            int choice;
-
-            Console.Clear();
-            Console.WriteLine("Main Menu:");
-            Console.WriteLine("1. View Available Cars");
-            Console.WriteLine("2. Rent a Car");
-            Console.WriteLine("3. View Rented Cars");
-            Console.WriteLine("4. Return a Car");
-            Console.WriteLine("5. Send Car to Maintenance");
-            Console.WriteLine("6. View Cars in Maintenance");
-            Console.WriteLine("7. View Mainthenance History");
-            Console.WriteLine("8. View Mainthenance History");
-            Console.WriteLine();
-
-            while (true)
+            int choice = 0;
+            while (choice != 10)
             {
-                Console.Write("Select an option (1-6): ");
-                int.TryParse(Console.ReadLine(), out choice);
+                Console.Clear();
+                Console.WriteLine("Main Menu:");
+                Console.WriteLine("1. View Available Cars");
+                Console.WriteLine("2. Rent a Car");
+                Console.WriteLine("3. View Rented Cars");
+                Console.WriteLine("4. Return a Car");
+                Console.WriteLine("5. Send Car to Maintenance or Return Car from Maintenance");
+                Console.WriteLine("6. View Cars in Maintenance");
+                Console.WriteLine("7. View Mainthenance History");
+                Console.WriteLine("8. Add a Car");
+                Console.WriteLine("9. Add Multiple Cars via CSV file");
+                Console.WriteLine("10. Exit and Save");
+                Console.WriteLine();
 
-                if (choice > 0 && choice < 7)
+                while (true)
                 {
-                    break;
+                    Console.Write("Select an option (1-10): ");
+                    int.TryParse(Console.ReadLine(), out choice);
+
+                    if (choice > 0 && choice < 11)
+                    {
+                        break;
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("Invalid choice. Please select a valid option.");
+                    }
                 }
 
-                else
+                switch (choice)
                 {
-                    Console.WriteLine("Invalid choice. Please select a valid option.");
+                    case 1:
+                        ViewAvailableCars();
+                        ReturnToMainMenu();
+                        break;
+                    case 2:
+                        RentCar();
+                        break;
+                    case 3:
+                        ViewRentedCars();
+                        ReturnToMainMenu();
+                        break;
+                    case 4:
+                        ReturnCar();
+                        ReturnToMainMenu();
+                        break;
+                    case 5:
+                        SendCarToMaintenanceOrReturnCarFromMaintenance();
+                        ReturnToMainMenu();
+                        break;
+                    case 6:
+                        ViewCarsInMaintenance();
+                        ReturnToMainMenu();
+                        break;
+                    case 7:
+                        ViewMaintenanceHistory();
+                        break;
+                    case 8:
+                        //AddCar();
+                        break;
+                    case 9:
+                        //AddCars();
+                        break;
+                    case 10:
+                        ExitSystem();
+                        break;
                 }
             }
-
-            switch (choice)
-            {
-                case 1:
-                    ViewAvailableCars();
-                    ReturnToMainMenu();
-                    break;
-                case 2:
-                    RentCar();
-                    break;
-                case 3:
-                    ViewRentedCars();
-                    ReturnToMainMenu();
-                    break;
-                case 4:
-                    ReturnCar();
-                    break;
-                case 5:
-                    SendCarToMaintenance();
-                    break;
-                case 6:
-                    ViewCarsInMaintenance();
-                    break;
-                case 7:
-                    ViewMaintenanceHistory();
-                    break;
-                case 8:
-                    Console.WriteLine("Exiting the system. Goodbye!");
-                    break;
-            }
+            
         }
 
         public static void ViewAvailableCars()
@@ -351,7 +321,6 @@ namespace _20260117_Car_Rental_System
             file_manager.Write(content, false);
             Console.WriteLine("Please enter any key to go back to main menu. Receipt has been printed.");
             Console.ReadKey();
-            MainMenu();
         }
 
         public static void ReturnCar()
@@ -376,37 +345,103 @@ namespace _20260117_Car_Rental_System
 
             Cars_In.carsAvailable.Add(Cars_Out.carsRented[carNumber - 1].Car);
             Cars_Out.carsRented.RemoveAt(carNumber - 1);
-            Console.WriteLine("Car has been returned successfully. Press any key to return to main menu.");
+            Console.WriteLine("Car has been returned successfully.");
         }
 
-        public static void SendCarToMaintenance()
+        public static void SendCarToMaintenanceOrReturnCarFromMaintenance()
         {
-            // Implementation for sending a car to maintenance
+            Console.Clear();
+
+            while (true)
+            {
+                Console.Write("Enter 1 to send a car to maintenance or 2 to return a car from maintenance: ");
+                int.TryParse(Console.ReadLine(), out int choice);
+
+                switch (choice)
+                {
+                    case 1:
+                        ViewAvailableCars();
+
+                        while (true)
+                        {
+                            Console.Write("Enter the car number to send to maintenance: ");
+                            if (int.TryParse(Console.ReadLine(), out int carNumber))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid input. Please enter a valid car number.");
+                            }
+
+                            Console.Write("Enter maintenance details: ");
+                            string maintenanceDetails = Console.ReadLine();
+
+                            Console.Write("Enter maintenance worker name: ");
+                            string maintenanceWorker = Console.ReadLine();
+
+                            Cars_in_Maintenance.carsInMaintenance.Add(new Maintenance(Cars_In.carsAvailable[carNumber - 1], maintenanceDetails, maintenanceWorker, DateTime.Now.ToString()));
+                        }
+                        break;
+                    case 2:
+                        ViewCarsInMaintenance();
+                        
+
+                        while (true)
+                        {
+                            Console.Write("Enter the car number to return from maintenance: ");
+                            if (int.TryParse(Console.ReadLine(), out int returnCarNumber))
+                            {
+                                Cars_In.carsAvailable.Add(Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car);
+                                File_Manager file_Manager = new File_Manager($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car.LicensePlate}");
+                                Cars_in_Maintenance.carsInMaintenance.RemoveAt(returnCarNumber - 1);
+
+                                List<string> content = new List<string>();
+                                content.Add($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartDate} | Maintenance details: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceDetails} | Maintenance worker: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceWorker} | Completed: {DateTime.Now}");
+
+                                file_Manager.Write(content);
+                                Console.WriteLine("Car has been returned from maintenance successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid input. Please enter a valid car number.");
+                            }
+                        }
+                        
+                        break;
+                    
+                    default:
+                        Console.WriteLine("Invalid choice. Please enter 1 or 2.");
+                        continue;
+                }
+            }
+            
+            
         }
 
         public static void ViewCarsInMaintenance()
         {
             Console.Clear();
             Console.WriteLine("Cars in Maintenance:");
-            foreach (Car car in Cars_in_Maintenance.carsInMaintenance)
+            for (int counter = 0; counter < Cars_in_Maintenance.carsInMaintenance.Count; counter++)
             {
-                Console.WriteLine($"{car.startMonth}/{car.startDay}/{car.startYear} to {car.endMonth}/{car.endDay}/{car.endYear}: {car.Name} - {car.Brand} - {car.Age} - {car.LicensePlate} | Maintenance staff: {car.maintenanceWorker}");
+                Maintenance maintenance = Cars_in_Maintenance.carsInMaintenance[counter];
+                Console.WriteLine($"{counter + 1}. {maintenance.Car.Name} - {maintenance.Car.Brand} - {maintenance.Car.Age} - {maintenance.Car.LicensePlate} | Maintenance staff: {maintenance.MaintenanceWorker} | Maintenance details: {maintenance.MaintenanceDetails}");
             }
-            Console.WriteLine("Press any key to return to the main menu.");
-            Console.ReadKey();
-            MainMenu();
         }
 
         public static void ExitSystem()
         {
             Console.WriteLine("Exiting the system. Goodbye!");
+            Cars_Out.ExportCarsOutList();
+            Cars_in_Maintenance.ExportMaintenancesList();
+            Cars_In.ExportCarsInList();
         }
 
         public static void ReturnToMainMenu()
         {
             Console.WriteLine("Press any key to return to the main menu.");
             Console.ReadKey();
-            MainMenu();
         }
 
         public static bool Check31Days(int rentalMonth)
