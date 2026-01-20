@@ -95,6 +95,7 @@ namespace _20260117_Car_Rental_System
                         break;
                     case 2:
                         RentCar();
+                        ReturnToMainMenu();
                         break;
                     case 3:
                         ViewRentedCars();
@@ -129,7 +130,7 @@ namespace _20260117_Car_Rental_System
                         break;
                 }
             }
-            
+
         }
 
         public static void AddCars()
@@ -177,7 +178,7 @@ namespace _20260117_Car_Rental_System
             Console.Write("Enter car name/model: ");
             name = Console.ReadLine();
             Console.Write("Enter car brand: ");
-            brand =  Console.ReadLine();
+            brand = Console.ReadLine();
             Console.Write("Enter car age: ");
             age = Console.ReadLine();
             while (true)
@@ -205,7 +206,7 @@ namespace _20260117_Car_Rental_System
 
             for (int counter = 0; counter < Cars_In.carsAvailable.Count; counter++)
             {
-                Console.WriteLine($"{counter+1}. {Cars_In.carsAvailable[counter].Name} - {Cars_In.carsAvailable[counter].Brand} - {Cars_In.carsAvailable[counter].Age} - {Cars_In.carsAvailable[counter].LicensePlate}");
+                Console.WriteLine($"{counter + 1}. {Cars_In.carsAvailable[counter].Name} - {Cars_In.carsAvailable[counter].Brand} - {Cars_In.carsAvailable[counter].Age} - {Cars_In.carsAvailable[counter].LicensePlate}");
             }
         }
 
@@ -244,25 +245,25 @@ namespace _20260117_Car_Rental_System
 
                 if (carNumber > 0 && carNumber <= Cars_In.carsAvailable.Count)
                 {
-                     break;
+                    break;
                 }
 
                 else
                 {
-                     Console.WriteLine("Invalid car number.");
-                }     
+                    Console.WriteLine("Invalid car number.");
+                }
             }
-            
+
             Console.Write("Enter your name: ");
             string borrowerName = Console.ReadLine();
 
             while (true)
             {
-                
+
                 Console.Write("Enter return year: ");
                 int.TryParse(Console.ReadLine(), out rentalYear);
 
-                if (rentalYear >= DateTime.Now.Year && rentalYear < DateTime.Now.Year+2)
+                if (rentalYear >= DateTime.Now.Year && rentalYear <= DateTime.Now.Year + 2)
                 {
                     break;
                 }
@@ -282,8 +283,8 @@ namespace _20260117_Car_Rental_System
                 {
                     if (rentalMonth >= DateTime.Now.Month && rentalMonth <= 12)
                     {
-                        Check31Days(rentalMonth);
-                        break;   
+                        thirtyOneDays = Check31Days(rentalMonth);
+                        break;
                     }
 
                     else
@@ -296,7 +297,7 @@ namespace _20260117_Car_Rental_System
                 {
                     if (rentalMonth >= 1 && rentalMonth <= 12)
                     {
-                        Check31Days(rentalMonth);
+                        thirtyOneDays = Check31Days(rentalMonth);
                         break;
                     }
 
@@ -326,6 +327,16 @@ namespace _20260117_Car_Rental_System
 
                 if (rentalYear == DateTime.Now.Year)
                 {
+                    if (rentalMonth == 2 && (DateTime.Now.Year - 2024) % 4 !=0)
+                    {
+                        monthDays = 28;
+                    }
+
+                    else if (rentalMonth == 2 && (DateTime.Now.Year - 2024) % 4 == 0)
+                    {
+                        monthDays = 29;
+                    }
+
                     if (rentalMonth == DateTime.Now.Month)
                     {
                         if (rentalDay >= DateTime.Now.Day && rentalDay <= monthDays)
@@ -369,7 +380,7 @@ namespace _20260117_Car_Rental_System
 
             string startDateTime = $"{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}";
             string endDateTime = $"{rentalMonth}/{rentalDay}/{rentalYear}";
-            Borrowed_Car borrowed_car = new Borrowed_Car(Cars_In.carsAvailable[carNumber-1],borrowerName,startDateTime,endDateTime);
+            Borrowed_Car borrowed_car = new Borrowed_Car(Cars_In.carsAvailable[carNumber - 1], borrowerName, startDateTime, endDateTime);
             Cars_Out.carsRented.Add(borrowed_car);
 
             Console.WriteLine($"{borrowed_car.Car.Name} has been rented on {borrowed_car.StartDateTime} until {borrowed_car.EndDateTime}.");
@@ -392,7 +403,7 @@ namespace _20260117_Car_Rental_System
         {
             int carNumber;
             ViewRentedCars();
-            while(true)
+            while (true)
             {
                 Console.Write("Enter the number of the car you want to return: ");
                 int.TryParse(Console.ReadLine(), out carNumber);
@@ -440,7 +451,7 @@ namespace _20260117_Car_Rental_System
                             else
                             {
                                 Console.WriteLine("Invalid input. Please enter a valid car number.");
-                            }    
+                            }
                         }
 
                         Console.Write("Enter maintenance details: ");
@@ -483,7 +494,7 @@ namespace _20260117_Car_Rental_System
                         Cars_in_Maintenance.carsInMaintenance.RemoveAt(returnCarNumber - 1);
 
                         break;
-                    
+
                     default:
                         Console.WriteLine("Invalid choice. Please enter 1 or 2.");
                         break;

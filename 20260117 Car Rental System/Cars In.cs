@@ -30,12 +30,12 @@ namespace _20260117_Car_Rental_System
         public static void InitializeCarsInList()
         {
             List<string> carLines = new List<string>();
-            Console.WriteLine("Adding cars to inventory from file...");
+            //Console.WriteLine("Adding cars to inventory from file...");
             File_Manager carFileManager = new File_Manager("cars_in.csv");
 
             if (!carFileManager.Read())
             {
-                Console.WriteLine("Error reading car data. Exiting...");
+                //Console.WriteLine("Error reading car data. Exiting...");
             }
 
             else
@@ -57,12 +57,12 @@ namespace _20260117_Car_Rental_System
                         if (!Rental_Manager.CheckDuplicates(plateNumber))
                         {
                             Cars_In.AddCar(car);
-                            Console.WriteLine($"Added car: {modelName}, {brand}, {age}, {plateNumber}");
+                            //Console.WriteLine($"Added car: {modelName}, {brand}, {age}, {plateNumber}");
                         }
 
                         else
                         {
-                            Console.WriteLine($"Duplicate car found with plate number: {plateNumber}. Skipping addition.");
+                            //Console.WriteLine($"Duplicate car found with plate number: {plateNumber}. Skipping addition.");
                         }
 
 
@@ -70,12 +70,12 @@ namespace _20260117_Car_Rental_System
 
                     else
                     {
-                        Console.WriteLine($"Invalid car data line: {line}");
+                        //Console.WriteLine($"Invalid car data line: {line}");
                     }
                 }
             }
 
-            Console.WriteLine("Car inventory loading complete. Enter any key to continue.");
+            //Console.WriteLine("Car inventory loading complete. Enter any key to continue.");
             Console.ReadKey();
         }
     }

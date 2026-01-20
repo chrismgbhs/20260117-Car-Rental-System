@@ -25,7 +25,7 @@ namespace _20260117_Car_Rental_System
         public static void ExportCarsOutList()
         {
             File_Manager file_Manager = new File_Manager("cars_out.csv");
-            
+
             List<string> lines = new List<string>();
 
             foreach (Borrowed_Car borrowed_Car in carsRented)
