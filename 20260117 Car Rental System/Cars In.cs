@@ -31,7 +31,7 @@ namespace _20260117_Car_Rental_System
         {
             List<string> carLines = new List<string>();
             Console.WriteLine("Adding cars to inventory from file...");
-            File_Manager carFileManager = new File_Manager("cars.csv");
+            File_Manager carFileManager = new File_Manager("cars_in.csv");
 
             if (!carFileManager.Read())
             {

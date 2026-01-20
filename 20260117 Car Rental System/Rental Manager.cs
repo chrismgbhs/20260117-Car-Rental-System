@@ -20,11 +20,6 @@ namespace _20260117_Car_Rental_System
             Cars_in_Maintenance.InitializeMaintenancesList();
         }
 
-        public static void AddCarsToInventory()
-        {
-            
-        }
-
         public static bool CheckDuplicates(string plateNumber)
         {
             bool duplicateFound = false;
@@ -62,6 +57,7 @@ namespace _20260117_Car_Rental_System
             while (choice != 10)
             {
                 Console.Clear();
+                Console.WriteLine("DO NOT CLOSE THE CONSOLE, INSTEAD JUST PLEASE SAVE AND EXIT.");
                 Console.WriteLine("Main Menu:");
                 Console.WriteLine("1. View Available Cars");
                 Console.WriteLine("2. Rent a Car");
@@ -118,12 +114,15 @@ namespace _20260117_Car_Rental_System
                         break;
                     case 7:
                         ViewMaintenanceHistory();
+                        ReturnToMainMenu();
                         break;
                     case 8:
-                        //AddCar();
+                        AddCar();
+                        ReturnToMainMenu();
                         break;
                     case 9:
-                        //AddCars();
+                        AddCars();
+                        ReturnToMainMenu();
                         break;
                     case 10:
                         ExitSystem();
@@ -131,6 +130,72 @@ namespace _20260117_Car_Rental_System
                 }
             }
             
+        }
+
+        public static void AddCars()
+        {
+            Console.Clear();
+            Console.Write("Enter the path of the CSV file to import cars from: ");
+            string filePath = Console.ReadLine();
+            File_Manager file_Manager = new File_Manager(filePath);
+            List<string> lines = file_Manager.getLines();
+            foreach (string line in lines)
+            {
+                string[] carDetails = line.Split(',');
+                if (carDetails.Length == 4)
+                {
+                    string name = carDetails[0].Trim();
+                    string brand = carDetails[1].Trim();
+                    string age = carDetails[2].Trim();
+                    string licensePlate = carDetails[3].Trim();
+                    if (!CheckDuplicates(licensePlate))
+                    {
+                        Car car = new Car(name, brand, age, licensePlate);
+                        Cars_In.carsAvailable.Add(car);
+                        Console.WriteLine($"{car.Name} has been added to the inventory successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Duplicate license plate found for {licensePlate}. Car not added.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid line format. Each line must contain exactly 4 values: Name, Brand, Age, License Plate.");
+                }
+            }
+            Console.WriteLine("Car import process completed.");
+        }
+
+        public static void AddCar()
+        {
+            Console.Clear();
+            string name;
+            string brand;
+            string age;
+            string licensePlate;
+            Console.Write("Enter car name/model: ");
+            name = Console.ReadLine();
+            Console.Write("Enter car brand: ");
+            brand =  Console.ReadLine();
+            Console.Write("Enter car age: ");
+            age = Console.ReadLine();
+            while (true)
+            {
+                Console.Write("Enter car license plate number: ");
+                licensePlate = Console.ReadLine();
+                if (!CheckDuplicates(licensePlate))
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Duplicate license plate found. Please enter a unique license plate number.");
+                }
+            }
+            Car car = new Car(name, brand, age, licensePlate);
+            Cars_In.carsAvailable.Add(car);
+            Console.WriteLine($"{car.Name} has been added to the inventory successfully.");
         }
 
         public static void ViewAvailableCars()
@@ -351,21 +416,51 @@ namespace _20260117_Car_Rental_System
         public static void SendCarToMaintenanceOrReturnCarFromMaintenance()
         {
             Console.Clear();
+            int choice = 0;
 
-            while (true)
+            while (choice < 1 || choice > 2)
             {
                 Console.Write("Enter 1 to send a car to maintenance or 2 to return a car from maintenance: ");
-                int.TryParse(Console.ReadLine(), out int choice);
+                int.TryParse(Console.ReadLine(), out choice);
 
                 switch (choice)
                 {
                     case 1:
                         ViewAvailableCars();
+                        int carNumber;
 
                         while (true)
                         {
                             Console.Write("Enter the car number to send to maintenance: ");
-                            if (int.TryParse(Console.ReadLine(), out int carNumber))
+                            if (int.TryParse(Console.ReadLine(), out carNumber))
+                            {
+                                break;
+                            }
+
+                            else
+                            {
+                                Console.WriteLine("Invalid input. Please enter a valid car number.");
+                            }    
+                        }
+
+                        Console.Write("Enter maintenance details: ");
+                        string maintenanceDetails = Console.ReadLine();
+
+                        Console.Write("Enter maintenance worker name: ");
+                        string maintenanceWorker = Console.ReadLine();
+
+                        Cars_in_Maintenance.carsInMaintenance.Add(new Maintenance(Cars_In.carsAvailable[carNumber - 1], maintenanceDetails, maintenanceWorker, DateTime.Now.ToString()));
+                        Cars_In.carsAvailable.RemoveAt(carNumber - 1);
+
+                        break;
+                    case 2:
+                        ViewCarsInMaintenance();
+                        int returnCarNumber;
+
+                        while (true)
+                        {
+                            Console.Write("Enter the car number to return from maintenance: ");
+                            if (int.TryParse(Console.ReadLine(), out returnCarNumber))
                             {
                                 break;
                             }
@@ -373,50 +468,27 @@ namespace _20260117_Car_Rental_System
                             {
                                 Console.WriteLine("Invalid input. Please enter a valid car number.");
                             }
-
-                            Console.Write("Enter maintenance details: ");
-                            string maintenanceDetails = Console.ReadLine();
-
-                            Console.Write("Enter maintenance worker name: ");
-                            string maintenanceWorker = Console.ReadLine();
-
-                            Cars_in_Maintenance.carsInMaintenance.Add(new Maintenance(Cars_In.carsAvailable[carNumber - 1], maintenanceDetails, maintenanceWorker, DateTime.Now.ToString()));
                         }
-                        break;
-                    case 2:
-                        ViewCarsInMaintenance();
-                        
 
-                        while (true)
-                        {
-                            Console.Write("Enter the car number to return from maintenance: ");
-                            if (int.TryParse(Console.ReadLine(), out int returnCarNumber))
-                            {
-                                Cars_In.carsAvailable.Add(Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car);
-                                File_Manager file_Manager = new File_Manager($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car.LicensePlate}");
-                                Cars_in_Maintenance.carsInMaintenance.RemoveAt(returnCarNumber - 1);
+                        Cars_In.carsAvailable.Add(Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car);
+                        File_Manager file_Manager = new File_Manager($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car.LicensePlate}");
 
-                                List<string> content = new List<string>();
-                                content.Add($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartDate} | Maintenance details: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceDetails} | Maintenance worker: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceWorker} | Completed: {DateTime.Now}");
+                        List<string> content = new List<string>();
+                        content.Add($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartDate} | Maintenance details: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceDetails} | Maintenance worker: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceWorker} | Completed: {DateTime.Now}");
 
-                                file_Manager.Write(content);
-                                Console.WriteLine("Car has been returned from maintenance successfully.");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Invalid input. Please enter a valid car number.");
-                            }
-                        }
-                        
+                        file_Manager.Write(content);
+                        Console.WriteLine("Car has been returned from maintenance successfully.");
+                        File_Manager file_manager = new File_Manager($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car.LicensePlate}.csv");
+                        file_manager.Write(content);
+                        Cars_in_Maintenance.carsInMaintenance.RemoveAt(returnCarNumber - 1);
+
                         break;
                     
                     default:
                         Console.WriteLine("Invalid choice. Please enter 1 or 2.");
-                        continue;
+                        break;
                 }
             }
-            
-            
         }
 
         public static void ViewCarsInMaintenance()
@@ -498,7 +570,17 @@ namespace _20260117_Car_Rental_System
 
         public static void ViewMaintenanceHistory()
         {
+            Console.Clear();
+            Console.Write("Enter the plate number of the car to view maintenance history: ");
+            string plateNumber = Console.ReadLine();
 
+            File_Manager file_Manager = new File_Manager($"{plateNumber}.csv");
+            List<string> lines = file_Manager.getLines();
+            Console.WriteLine($"Maintenance History for Car with Plate Number {plateNumber}: ");
+            foreach (string line in lines)
+            {
+                Console.WriteLine(line);
+            }
         }
     }
 }

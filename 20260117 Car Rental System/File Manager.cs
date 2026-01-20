@@ -88,7 +88,7 @@ namespace _20260117_Car_Rental_System
             {
                 // On failure, populate the cache with the error message to aid debugging,
                 // and return false so callers can detect the failure without an exception.
-                lines.Add(e.Message);
+                //lines.Add(e.Message);
                 //Console.WriteLine("Error reading file: " + e.Message);
                 return false;
             }

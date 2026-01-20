@@ -31,7 +31,7 @@ namespace _20260117_Car_Rental_System
 
             foreach (Maintenance maintenance in carsInMaintenance)
             {
-                lines.Add($"{maintenance.Car.Name},{maintenance.Car.Brand},{maintenance.Car.Age},{maintenance.Car.LicensePlate},{maintenance.MaintenanceDetails},{maintenance.MaintenanceWorker}");
+                lines.Add($"{maintenance.Car.Name},{maintenance.Car.Brand},{maintenance.Car.Age},{maintenance.Car.LicensePlate},{maintenance.MaintenanceDetails},{maintenance.MaintenanceWorker},{maintenance.StartDate}");
             }
 
             file_Manager.Write(lines, false);
