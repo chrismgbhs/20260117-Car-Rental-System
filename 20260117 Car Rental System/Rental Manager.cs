@@ -202,11 +202,32 @@ namespace _20260117_Car_Rental_System
         public static void ViewAvailableCars()
         {
             Console.Clear();
-            Console.WriteLine("Available Cars:");
+            Console.WriteLine("Available Cars with their Status:");
 
             for (int counter = 0; counter < Cars_In.carsAvailable.Count; counter++)
             {
+                bool forRent;
+                bool forMaintenance;
+
                 Console.WriteLine($"{counter + 1}. {Cars_In.carsAvailable[counter].Name} - {Cars_In.carsAvailable[counter].Brand} - {Cars_In.carsAvailable[counter].Age} - {Cars_In.carsAvailable[counter].LicensePlate}");
+
+                foreach (Borrowed_Car borrowed_Car in Cars_Out.carsRented)
+                {
+                    if (borrowed_Car.Car.LicensePlate == Cars_In.carsAvailable[counter].LicensePlate)
+                    {
+                        Console.WriteLine($"Scheduled for rent: {borrowed_Car.StartYear}/{borrowed_Car.StartMonth}/{borrowed_Car.StartDay} until {borrowed_Car.EndYear}/{borrowed_Car.EndMonth}/{borrowed_Car.EndDay}");
+                    }
+                }
+
+                foreach (Maintenance maintenance in Cars_in_Maintenance.carsInMaintenance)
+                {
+                    if (maintenance.Car.LicensePlate == Cars_In.carsAvailable[counter].LicensePlate)
+                    {
+                        Console.WriteLine($"Scheduled for maintenance: {maintenance.StartYear}/{maintenance.StartMonth}/{maintenance.StartDay} until {maintenance.EndYear}/{maintenance.EndMonth}/{maintenance.EndDay}");
+                    }
+                }
+
+                Console.WriteLine();
             }
         }
 
@@ -221,13 +242,16 @@ namespace _20260117_Car_Rental_System
             foreach (Borrowed_Car borrowed_car in Cars_Out.carsRented)
             {
                 counter++;
-                Console.WriteLine($"{counter}. {borrowed_car.StartDateTime} to {borrowed_car.EndDateTime}: {borrowed_car.Car.Name} - {borrowed_car.Car.Brand} - {borrowed_car.Car.Age} - {borrowed_car.Car.LicensePlate} | Borrower: {borrowed_car.BorrowerName}");
+                Console.WriteLine($"{counter}. {borrowed_car.StartYear}/{borrowed_car.StartMonth}/{borrowed_car.StartDay} until {borrowed_car.EndYear}/{borrowed_car.EndMonth}/{borrowed_car.EndDay}: {borrowed_car.Car.Name} - {borrowed_car.Car.Brand} - {borrowed_car.Car.Age} - {borrowed_car.Car.LicensePlate} | Borrower: {borrowed_car.BorrowerName}");
             }
         }
 
         public static void RentCar()
         {
             int carNumber;
+            int startYear;
+            int startMonth;
+            int startDay;
             int rentalYear;
             int rentalMonth;
             int rentalDay;
@@ -257,13 +281,135 @@ namespace _20260117_Car_Rental_System
             Console.Write("Enter your name: ");
             string borrowerName = Console.ReadLine();
 
+            
+            while (true)
+            {
+
+                Console.Write("Enter rental start year : ");
+                int.TryParse(Console.ReadLine(), out startYear);
+
+                if (startYear >= DateTime.Now.Year && startYear <= DateTime.Now.Year + 2)
+                {
+                    break;
+                }
+
+                else
+                {
+                    Console.WriteLine("Invalid year. Please enter a valid year within two years.");
+                }
+            }
+
+            while (true)
+            {
+                Console.Write("Enter start month (1-12): ");
+                int.TryParse(Console.ReadLine(), out startMonth);
+
+                if (startYear == DateTime.Now.Year)
+                {
+                    if (startMonth >= DateTime.Now.Month && startMonth <= 12)
+                    {
+                        thirtyOneDays = Check31Days(startMonth);
+                        break;
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("Invalid rental month.");
+                    }
+                }
+
+                else
+                {
+                    if (startMonth >= 1 && startMonth <= 12)
+                    {
+                        thirtyOneDays = Check31Days(startMonth);
+                        break;
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("Invalid rental month input.");
+                    }
+                }
+            }
+
+            while (true)
+            {
+                int monthDays;
+
+                if (thirtyOneDays)
+                {
+                    monthDays = 31;
+                }
+
+                else
+                {
+                    monthDays = 30;
+                }
+
+                Console.Write("Enter start day: ");
+                int.TryParse(Console.ReadLine(), out startDay);
+
+                if (startYear == DateTime.Now.Year)
+                {
+                    if (startMonth == 2 && (DateTime.Now.Year - 2024) % 4 != 0)
+                    {
+                        monthDays = 28;
+                    }
+
+                    else if (startMonth == 2 && (DateTime.Now.Year - 2024) % 4 == 0)
+                    {
+                        monthDays = 29;
+                    }
+
+                    if (startMonth == DateTime.Now.Month)
+                    {
+                        if (startDay >= DateTime.Now.Day && startDay <= monthDays)
+                        {
+                            break;
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("Invalid start day.");
+                        }
+                    }
+
+                    else
+                    {
+                        if (startDay >= 1 && startDay <= monthDays)
+                        {
+                            break;
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("Invalid start day.");
+                        }
+                    }
+                }
+
+                else
+                {
+                    if (startDay >= 1 && startDay <= monthDays)
+                    {
+                        break;
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("Invalid start day.");
+                    }
+                }
+            }
+
             while (true)
             {
 
                 Console.Write("Enter return year: ");
                 int.TryParse(Console.ReadLine(), out rentalYear);
 
-                if (rentalYear >= DateTime.Now.Year && rentalYear <= DateTime.Now.Year + 2)
+                if (rentalYear >= startYear && rentalYear <= startYear + 2)
                 {
                     break;
                 }
@@ -279,9 +425,9 @@ namespace _20260117_Car_Rental_System
                 Console.Write("Enter return month (1-12): ");
                 int.TryParse(Console.ReadLine(), out rentalMonth);
 
-                if (rentalYear == DateTime.Now.Year)
+                if (rentalYear == startYear)
                 {
-                    if (rentalMonth >= DateTime.Now.Month && rentalMonth <= 12)
+                    if (rentalMonth >= startMonth && rentalMonth <= 12)
                     {
                         thirtyOneDays = Check31Days(rentalMonth);
                         break;
@@ -325,7 +471,7 @@ namespace _20260117_Car_Rental_System
                 Console.Write("Enter return day: ");
                 int.TryParse(Console.ReadLine(), out rentalDay);
 
-                if (rentalYear == DateTime.Now.Year)
+                if (rentalYear == startYear)
                 {
                     if (rentalMonth == 2 && (DateTime.Now.Year - 2024) % 4 !=0)
                     {
@@ -337,9 +483,9 @@ namespace _20260117_Car_Rental_System
                         monthDays = 29;
                     }
 
-                    if (rentalMonth == DateTime.Now.Month)
+                    if (rentalMonth == startMonth)
                     {
-                        if (rentalDay >= DateTime.Now.Day && rentalDay <= monthDays)
+                        if (rentalDay >= startDay && rentalDay <= monthDays)
                         {
                             break;
                         }
@@ -378,25 +524,196 @@ namespace _20260117_Car_Rental_System
                 }
             }
 
-            string startDateTime = $"{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}";
-            string endDateTime = $"{rentalMonth}/{rentalDay}/{rentalYear}";
-            Borrowed_Car borrowed_car = new Borrowed_Car(Cars_In.carsAvailable[carNumber - 1], borrowerName, startDateTime, endDateTime);
-            Cars_Out.carsRented.Add(borrowed_car);
+            bool overlapFound = false;
+            string sMonth;
+            string sDay;
+            string eMonth;
+            string eDay;
+            
+            if (startMonth.ToString().Length == 1)
+            {
+                sMonth = $"0{startMonth}";
+            }
 
-            Console.WriteLine($"{borrowed_car.Car.Name} has been rented on {borrowed_car.StartDateTime} until {borrowed_car.EndDateTime}.");
+            else
+            {
+                sMonth = startMonth.ToString(); 
+            }
 
-            List<string> content = new List<string>();
-            content.Add(DateTime.Now.ToString());
+            if (startDay.ToString().Length == 1)
+            {
+                sDay = $"0{startDay}";
+            }
 
-            content.Add($"Model: {borrowed_car.Car.Name} | Plate Number: {borrowed_car.Car.LicensePlate}");
-            content.Add($"Borrowed by {borrowed_car.BorrowerName} from {borrowed_car.StartDateTime} until {borrowed_car.EndDateTime}");
+            else
+            {
+                sDay = startDay.ToString();
+            }
 
-            Cars_In.carsAvailable.RemoveAt(carNumber - 1);
+            if (rentalMonth.ToString().Length == 1)
+            {
+                eMonth = $"0{rentalMonth}";
+            }
 
-            File_Manager file_manager = new File_Manager("receipt.csv");
-            file_manager.Write(content, false);
-            Console.WriteLine("Please enter any key to go back to main menu. Receipt has been printed.");
-            Console.ReadKey();
+            else
+            {
+                eMonth = rentalMonth.ToString();
+            }
+
+            if (rentalDay.ToString().Length == 1)
+            {
+                eDay = $"0{rentalDay}";
+            }
+
+            else
+            {
+                eDay = rentalDay.ToString();
+            }
+
+            string rentalStartDate = $"{startYear}{sMonth}{sDay}";
+            string rentalEndDate = $"{rentalYear}{eMonth}{eDay}";
+
+            foreach (Borrowed_Car borrowed_car in Cars_Out.carsRented)
+            {
+                    string stMonth;
+                    string stDay;
+                    string enMonth;
+                    string enDay;
+
+                    if (borrowed_car.StartMonth.ToString().Length == 1)
+                    {
+                        stMonth = $"0{borrowed_car.StartMonth}";
+                    }
+
+                    else
+                    {
+                        stMonth = borrowed_car.StartMonth.ToString();
+                    }
+
+                    if (borrowed_car.StartDay.ToString().Length == 1)
+                    {
+                        stDay = $"0{borrowed_car.StartDay}";
+                    }
+
+                    else
+                    {
+                        stDay = borrowed_car.StartDay.ToString();
+                    }
+
+                    if (borrowed_car.EndMonth.ToString().Length == 1)
+                    {
+                        enMonth = $"0{borrowed_car.EndMonth}";
+                    }
+
+                    else
+                    {
+                        enMonth = borrowed_car.EndMonth.ToString();
+                    }
+
+                    if (borrowed_car.EndDay.ToString().Length == 1)
+                    {
+                        enDay = $"0{borrowed_car.EndDay}";
+                    }
+
+                    else
+                    {
+                        enDay = borrowed_car.EndDay.ToString();
+                    }
+
+                    string existingStartDate = $"{borrowed_car.StartYear}{stMonth}{stDay}";
+                    string existingEndDate = $"{borrowed_car.EndYear}{enMonth}{enDay}";
+                    int intStartDate = int.Parse(existingStartDate);
+                    int intEndDate = int.Parse(existingEndDate);
+
+                    int intRentalStartDate = int.Parse(rentalStartDate);
+                    int intRentalEndDate = int.Parse(rentalEndDate);
+
+                if ( borrowed_car.Car.LicensePlate == Cars_In.carsAvailable[carNumber-1].LicensePlate && ((intRentalStartDate >= intStartDate && intRentalStartDate < intEndDate) || (intRentalEndDate > intStartDate && intRentalEndDate < intEndDate) || (intRentalStartDate > intEndDate)))
+                {
+                        overlapFound = true;
+                    Console.WriteLine("The selected rental period overlaps with an existing rental schedule for this car. Please choose different dates. You also can't schedule a car to be rented if it is pre-scheduled for rent.");
+                    Console.WriteLine($"Overlapping rental period: {borrowed_car.StartYear}/{borrowed_car.StartMonth}/{borrowed_car.StartDay} to {borrowed_car.EndYear}/{borrowed_car.EndMonth}/{borrowed_car.EndDay}");
+                        break;
+                }
+
+                else
+                {
+                    foreach (Maintenance maintenance in Cars_in_Maintenance.carsInMaintenance)
+                    {
+                        if (maintenance.StartMonth.ToString().Length == 1)
+                        {
+                            stMonth = $"0{maintenance.StartMonth}";
+                        }
+
+                        else
+                        {
+                            stMonth = maintenance.StartMonth.ToString();
+                        }
+
+                        if (maintenance.StartDay.ToString().Length == 1)
+                        {
+                            stDay = $"0{maintenance.StartDay}";
+                        }
+
+                        else
+                        {
+                            stDay = maintenance.StartDay.ToString();
+                        }
+
+                        if (maintenance.EndMonth.ToString().Length == 1)
+                        {
+                            enMonth = $"0{maintenance.EndMonth}";
+                        }
+
+                        else
+                        {
+                            enMonth = maintenance.EndMonth.ToString();
+                        }
+
+                        if (maintenance.EndDay.ToString().Length == 1)
+                        {
+                            enDay = $"0{maintenance.EndDay}";
+                        }
+
+                        else
+                        {
+                            enDay = maintenance.EndDay.ToString();
+                        }
+
+                        existingStartDate = $"{maintenance.StartYear}{stMonth}{stDay}";
+                        existingEndDate = $"{maintenance.EndYear}{enMonth}{enDay}";
+                        intStartDate = int.Parse(existingStartDate);
+                        intEndDate = int.Parse(existingEndDate);
+
+                        if (maintenance.Car.LicensePlate == Cars_In.carsAvailable[carNumber - 1].LicensePlate && ((intRentalStartDate >= intStartDate && intRentalStartDate < intEndDate) || (intRentalEndDate > intStartDate && intRentalEndDate < intEndDate) || (intRentalStartDate > intEndDate)))
+                        {
+                            overlapFound = true;
+                            Console.WriteLine("The selected rental period overlaps with an existing maintenance schedule for this car. Please choose different dates. You also can't schedule a car to be rented if it is scheduled for maintenance first.");
+                            Console.WriteLine($"Overlapping rental period: {maintenance.StartYear}/{maintenance.StartMonth}/{maintenance.StartDay} to {maintenance.EndYear}/{maintenance.EndMonth}/{maintenance.EndDay}");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!overlapFound)
+            {
+                string startDateTime = $"{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}";
+                string endDateTime = $"{rentalMonth}/{rentalDay}/{rentalYear}";
+                Borrowed_Car borrowed_car = new Borrowed_Car(Cars_In.carsAvailable[carNumber - 1], borrowerName, startYear, startMonth, startDay, rentalYear, rentalMonth, rentalDay);
+                Cars_Out.carsRented.Add(borrowed_car);
+
+                Console.WriteLine($"{borrowed_car.Car.Name} has been rented on {borrowed_car.StartYear}/{borrowed_car.StartMonth}/{borrowed_car.StartDay} until {borrowed_car.EndYear}/{borrowed_car.EndMonth}/{borrowed_car.EndDay}.");
+
+                List<string> content = new List<string>();
+                content.Add(DateTime.Now.ToString());
+
+                content.Add($"Model: {borrowed_car.Car.Name} | Plate Number: {borrowed_car.Car.LicensePlate}");
+                content.Add($"Borrowed by {borrowed_car.BorrowerName} from {borrowed_car.StartYear}/{borrowed_car.StartMonth}/{borrowed_car.StartDay} until {borrowed_car.EndYear}/{borrowed_car.EndMonth}/{borrowed_car.EndDay}");
+
+                File_Manager file_manager = new File_Manager("receipt.csv");
+                file_manager.Write(content, false);
+            }
         }
 
         public static void ReturnCar()
@@ -419,7 +736,6 @@ namespace _20260117_Car_Rental_System
                 }
             }
 
-            Cars_In.carsAvailable.Add(Cars_Out.carsRented[carNumber - 1].Car);
             Cars_Out.carsRented.RemoveAt(carNumber - 1);
             Console.WriteLine("Car has been returned successfully.");
         }
@@ -460,8 +776,375 @@ namespace _20260117_Car_Rental_System
                         Console.Write("Enter maintenance worker name: ");
                         string maintenanceWorker = Console.ReadLine();
 
-                        Cars_in_Maintenance.carsInMaintenance.Add(new Maintenance(Cars_In.carsAvailable[carNumber - 1], maintenanceDetails, maintenanceWorker, DateTime.Now.ToString()));
-                        Cars_In.carsAvailable.RemoveAt(carNumber - 1);
+                        bool thirtyOneDays;
+                        int startYear;
+                        int startMonth;
+                        int startDay;
+                        int rentalYear;
+                        int rentalMonth;
+                        int rentalDay;
+
+
+                        while (true)
+                        {
+
+                            Console.Write("Enter maintenance start year : ");
+                            int.TryParse(Console.ReadLine(), out startYear);
+
+                            if (startYear >= DateTime.Now.Year && startYear <= DateTime.Now.Year + 2)
+                            {
+                                break;
+                            }
+
+                            else
+                            {
+                                Console.WriteLine("Invalid year. Please enter a valid year within two years.");
+                            }
+                        }
+
+                        while (true)
+                        {
+                            Console.Write("Enter start month (1-12): ");
+                            int.TryParse(Console.ReadLine(), out startMonth);
+
+                            if (startYear == DateTime.Now.Year)
+                            {
+                                if (startMonth >= DateTime.Now.Month && startMonth <= 12)
+                                {
+                                    thirtyOneDays = Check31Days(startMonth);
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalid month.");
+                                }
+                            }
+
+                            else
+                            {
+                                if (startMonth >= 1 && startMonth <= 12)
+                                {
+                                    thirtyOneDays = Check31Days(startMonth);
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalidmonth input.");
+                                }
+                            }
+                        }
+
+                        while (true)
+                        {
+                            int monthDays;
+
+                            if (thirtyOneDays)
+                            {
+                                monthDays = 31;
+                            }
+
+                            else
+                            {
+                                monthDays = 30;
+                            }
+
+                            Console.Write("Enter start day: ");
+                            int.TryParse(Console.ReadLine(), out startDay);
+
+                            if (startYear == DateTime.Now.Year)
+                            {
+                                if (startMonth == 2 && (DateTime.Now.Year - 2024) % 4 != 0)
+                                {
+                                    monthDays = 28;
+                                }
+
+                                else if (startMonth == 2 && (DateTime.Now.Year - 2024) % 4 == 0)
+                                {
+                                    monthDays = 29;
+                                }
+
+                                if (startMonth == DateTime.Now.Month)
+                                {
+                                    if (startDay >= DateTime.Now.Day && startDay <= monthDays)
+                                    {
+                                        break;
+                                    }
+
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid day.");
+                                    }
+                                }
+
+                                else
+                                {
+                                    if (startDay >= 1 && startDay <= monthDays)
+                                    {
+                                        break;
+                                    }
+
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid day.");
+                                    }
+                                }
+                            }
+
+                            else
+                            {
+                                if (startDay >= 1 && startDay <= monthDays)
+                                {
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalid day.");
+                                }
+                            }
+                        }
+
+                        while (true)
+                        {
+
+                            Console.Write("Enter return year: ");
+                            int.TryParse(Console.ReadLine(), out rentalYear);
+
+                            if (rentalYear >= startYear && rentalYear <= startYear + 2)
+                            {
+                                break;
+                            }
+
+                            else
+                            {
+                                Console.WriteLine("Invalid year. Please enter a valid year within two years.");
+                            }
+                        }
+
+                        while (true)
+                        {
+                            Console.Write("Enter return month (1-12): ");
+                            int.TryParse(Console.ReadLine(), out rentalMonth);
+
+                            if (rentalYear == startYear)
+                            {
+                                if (rentalMonth >= startMonth && rentalMonth <= 12)
+                                {
+                                    thirtyOneDays = Check31Days(rentalMonth);
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalid month.");
+                                }
+                            }
+
+                            else
+                            {
+                                if (rentalMonth >= 1 && rentalMonth <= 12)
+                                {
+                                    thirtyOneDays = Check31Days(rentalMonth);
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalid month input.");
+                                }
+                            }
+                        }
+
+                        while (true)
+                        {
+                            int monthDays;
+
+                            if (thirtyOneDays)
+                            {
+                                monthDays = 31;
+                            }
+
+                            else
+                            {
+                                monthDays = 30;
+                            }
+
+                            Console.Write("Enter return day: ");
+                            int.TryParse(Console.ReadLine(), out rentalDay);
+
+                            if (rentalYear == startYear)
+                            {
+                                if (rentalMonth == 2 && (DateTime.Now.Year - 2024) % 4 != 0)
+                                {
+                                    monthDays = 28;
+                                }
+
+                                else if (rentalMonth == 2 && (DateTime.Now.Year - 2024) % 4 == 0)
+                                {
+                                    monthDays = 29;
+                                }
+
+                                if (rentalMonth == startMonth)
+                                {
+                                    if (rentalDay >= startDay && rentalDay <= monthDays)
+                                    {
+                                        break;
+                                    }
+
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid day.");
+                                    }
+                                }
+
+                                else
+                                {
+                                    if (rentalDay >= 1 && rentalDay <= monthDays)
+                                    {
+                                        break;
+                                    }
+
+                                    else
+                                    {
+                                        Console.WriteLine("Invalid day.");
+                                    }
+                                }
+                            }
+
+                            else
+                            {
+                                if (rentalDay >= 1 && rentalDay <= monthDays)
+                                {
+                                    break;
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Invalid day.");
+                                }
+                            }
+                        }
+
+                        bool overlapFound = false;
+                        string sMonth;
+                        string sDay;
+                        string eMonth;
+                        string eDay;
+
+                        if (startMonth.ToString().Length == 1)
+                        {
+                            sMonth = $"0{startMonth}";
+                        }
+
+                        else
+                        {
+                            sMonth = startMonth.ToString();
+                        }
+
+                        if (startDay.ToString().Length == 1)
+                        {
+                            sDay = $"0{startDay}";
+                        }
+
+                        else
+                        {
+                            sDay = startDay.ToString();
+                        }
+
+                        if (rentalMonth.ToString().Length == 1)
+                        {
+                            eMonth = $"0{rentalMonth}";
+                        }
+
+                        else
+                        {
+                            eMonth = rentalMonth.ToString();
+                        }
+
+                        if (rentalDay.ToString().Length == 1)
+                        {
+                            eDay = $"0{rentalDay}";
+                        }
+
+                        else
+                        {
+                            eDay = rentalDay.ToString();
+                        }
+
+                        string rentalStartDate = $"{startYear}{startMonth}{startDay}";
+                        string rentalEndDate = $"{rentalYear}{rentalMonth}{rentalDay}";
+
+                        foreach (Borrowed_Car borrowed_car in Cars_Out.carsRented)
+                        {
+                            string stMonth;
+                            string stDay;
+                            string enMonth;
+                            string enDay;
+
+                            if (borrowed_car.StartMonth.ToString().Length == 1)
+                            {
+                                stMonth = $"0{borrowed_car.StartMonth}";
+                            }
+
+                            else
+                            {
+                                stMonth = borrowed_car.StartMonth.ToString();
+                            }
+
+                            if (borrowed_car.StartDay.ToString().Length == 1)
+                            {
+                                stDay = $"0{borrowed_car.StartDay}";
+                            }
+
+                            else
+                            {
+                                stDay = borrowed_car.StartDay.ToString();
+                            }
+
+                            if (borrowed_car.EndMonth.ToString().Length == 1)
+                            {
+                                enMonth = $"0{borrowed_car.EndMonth}";
+                            }
+
+                            else
+                            {
+                                enMonth = borrowed_car.EndMonth.ToString();
+                            }
+
+                            if (borrowed_car.EndDay.ToString().Length == 1)
+                            {
+                                enDay = $"0{borrowed_car.EndDay}";
+                            }
+
+                            else
+                            {
+                                enDay = borrowed_car.EndDay.ToString();
+                            }
+
+                            string existingStartDate = $"{borrowed_car.StartYear}{borrowed_car.StartMonth}{borrowed_car.StartDay}";
+                            string existingEndDate = $"{borrowed_car.EndYear}{borrowed_car.EndMonth}{borrowed_car.EndDay}";
+                            int intStartDate = int.Parse(existingStartDate);
+                            int intEndDate = int.Parse(existingEndDate);
+
+                            int intRentalStartDate = int.Parse(rentalStartDate);
+                            int intRentalEndDate = int.Parse(rentalEndDate);
+
+                            if (borrowed_car.Car.LicensePlate == Cars_In.carsAvailable[carNumber - 1].LicensePlate && ((intRentalStartDate >= intStartDate && intRentalStartDate < intEndDate) || (intRentalEndDate > intStartDate && intRentalEndDate < intEndDate) || (intRentalStartDate > intEndDate)))
+                            {
+                                overlapFound = true;
+                                Console.WriteLine("The selected maintenance period overlaps with an existing rental for this car. Please choose different dates. You also can't send a car to maintenance if it hasn't returned yet.");
+                                Console.WriteLine($"Overlapping rental period: {borrowed_car.StartYear}/{borrowed_car.StartMonth}/{borrowed_car.StartDay} to {borrowed_car.EndYear}/{borrowed_car.EndMonth}/{borrowed_car.EndDay}");
+                                break;
+                            }
+                        }
+
+                        if (!overlapFound)
+                        {
+                            Cars_in_Maintenance.carsInMaintenance.Add(new Maintenance(Cars_In.carsAvailable[carNumber - 1], maintenanceDetails, maintenanceWorker, startYear, startMonth, startDay, rentalYear, rentalMonth, rentalDay));
+                        }
+                        
 
                         break;
                     case 2:
@@ -481,11 +1164,10 @@ namespace _20260117_Car_Rental_System
                             }
                         }
 
-                        Cars_In.carsAvailable.Add(Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car);
                         File_Manager file_Manager = new File_Manager($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].Car.LicensePlate}");
 
                         List<string> content = new List<string>();
-                        content.Add($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartDate} | Maintenance details: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceDetails} | Maintenance worker: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceWorker} | Completed: {DateTime.Now}");
+                        content.Add($"{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartYear}/{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartMonth}/{Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].StartDay} | Maintenance details: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceDetails} | Maintenance worker: {Cars_in_Maintenance.carsInMaintenance[returnCarNumber - 1].MaintenanceWorker} | Completed: {DateTime.Now}");
 
                         file_Manager.Write(content);
                         Console.WriteLine("Car has been returned from maintenance successfully.");
@@ -509,7 +1191,7 @@ namespace _20260117_Car_Rental_System
             for (int counter = 0; counter < Cars_in_Maintenance.carsInMaintenance.Count; counter++)
             {
                 Maintenance maintenance = Cars_in_Maintenance.carsInMaintenance[counter];
-                Console.WriteLine($"{counter + 1}. {maintenance.Car.Name} - {maintenance.Car.Brand} - {maintenance.Car.Age} - {maintenance.Car.LicensePlate} | Maintenance staff: {maintenance.MaintenanceWorker} | Maintenance details: {maintenance.MaintenanceDetails}");
+                Console.WriteLine($"{counter + 1}. {maintenance.StartYear}/{maintenance.StartMonth}/{maintenance.StartDay} to {maintenance.EndYear}/{maintenance.EndMonth}/{maintenance.EndDay} - {maintenance.Car.Name} - {maintenance.Car.Brand} - {maintenance.Car.Age} - {maintenance.Car.LicensePlate} | Maintenance staff: {maintenance.MaintenanceWorker} | Maintenance details: {maintenance.MaintenanceDetails}");
             }
         }
 

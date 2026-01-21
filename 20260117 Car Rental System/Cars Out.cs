@@ -17,7 +17,7 @@ namespace _20260117_Car_Rental_System
             foreach (string line in file_Manager.getLines())
             {
                 Car car = new Car(line.Split(',')[0].Trim(), line.Split(',')[1].Trim(), line.Split(',')[2].Trim(), line.Split(',')[3].Trim());
-                Borrowed_Car borrowed_Car = new Borrowed_Car(car, line.Split(',')[4].Trim(), line.Split(',')[5].Trim(), line.Split(',')[6].Trim());
+                Borrowed_Car borrowed_Car = new Borrowed_Car(car, line.Split(',')[4].Trim(), int.Parse(line.Split(',')[5].Trim()), int.Parse(line.Split(',')[6].Trim()), int.Parse(line.Split(',')[7].Trim()), int.Parse(line.Split(',')[8].Trim()), int.Parse(line.Split(',')[9].Trim()), int.Parse(line.Split(',')[10].Trim()));
                 carsRented.Add(borrowed_Car);
             }
         }
@@ -30,7 +30,7 @@ namespace _20260117_Car_Rental_System
 
             foreach (Borrowed_Car borrowed_Car in carsRented)
             {
-                lines.Add($"{borrowed_Car.Car.Name},{borrowed_Car.Car.Brand},{borrowed_Car.Car.Age},{borrowed_Car.Car.LicensePlate},{borrowed_Car.BorrowerName},{borrowed_Car.StartDateTime},{borrowed_Car.EndDateTime}");
+                lines.Add($"{borrowed_Car.Car.Name},{borrowed_Car.Car.Brand},{borrowed_Car.Car.Age},{borrowed_Car.Car.LicensePlate},{borrowed_Car.BorrowerName},{borrowed_Car.StartYear},{borrowed_Car.StartMonth},{borrowed_Car.StartDay},{borrowed_Car.EndYear},{borrowed_Car.EndMonth},{borrowed_Car.EndDay}");
             }
 
             file_Manager.Write(lines, false);

@@ -18,7 +18,7 @@ namespace _20260117_Car_Rental_System
             foreach (string line in file_Manager.getLines())
             {
                     Car car = new Car(line.Split(',')[0].Trim(), line.Split(',')[1].Trim(), line.Split(',')[2].Trim(), line.Split(',')[3].Trim());
-                    Maintenance maintenance = new Maintenance(car, line.Split(',')[4].Trim(), line.Split(',')[5].Trim(), line.Split(',')[6].Trim());
+                    Maintenance maintenance = new Maintenance(car, line.Split(',')[4].Trim(), line.Split(',')[5].Trim(), int.Parse(line.Split(',')[6].Trim()), int.Parse(line.Split(',')[7].Trim()), int.Parse(line.Split(',')[8].Trim()), int.Parse(line.Split(',')[9].Trim()), int.Parse(line.Split(',')[10].Trim()), int.Parse(line.Split(',')[11].Trim()));
                     carsInMaintenance.Add(maintenance);
             }
         }
@@ -31,7 +31,7 @@ namespace _20260117_Car_Rental_System
 
             foreach (Maintenance maintenance in carsInMaintenance)
             {
-                lines.Add($"{maintenance.Car.Name},{maintenance.Car.Brand},{maintenance.Car.Age},{maintenance.Car.LicensePlate},{maintenance.MaintenanceDetails},{maintenance.MaintenanceWorker},{maintenance.StartDate}");
+                lines.Add($"{maintenance.Car.Name},{maintenance.Car.Brand},{maintenance.Car.Age},{maintenance.Car.LicensePlate},{maintenance.MaintenanceDetails},{maintenance.MaintenanceWorker},{maintenance.StartYear},{maintenance.StartMonth},{maintenance.StartDay},{maintenance.EndYear},{maintenance.EndMonth},{maintenance.EndDay}");
             }
 
             file_Manager.Write(lines, false);

@@ -10,15 +10,23 @@ namespace _20260117_Car_Rental_System
     {
         public Car Car;
         public string BorrowerName;
-        public string StartDateTime;
-        public string EndDateTime;
+        public int StartYear;
+        public int StartMonth;
+        public int StartDay;
+        public int EndYear;
+        public int EndMonth;
+        public int EndDay;
 
-        public Borrowed_Car(Car car, string borrowerName, string startDateTime, string endDateTime)
+        public Borrowed_Car(Car car, string borrowerName, int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay)
         {
             Car = car;
             BorrowerName = borrowerName;
-            StartDateTime = startDateTime;
-            EndDateTime = endDateTime;
+            StartYear = startYear;
+            StartMonth = startMonth;
+            StartDay = startDay;
+            EndYear = endYear;
+            EndMonth = endMonth;
+            EndDay = endDay;
         }
     }
 }
